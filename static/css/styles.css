@@ -147,7 +147,7 @@ html {
 
 .items {
     overflow-y: auto;
-    width: fit-content;
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -201,6 +201,7 @@ html {
 
 .right {
     right: 0;
+    flex-direction: row-reverse;
 }
 
 .addtop {
