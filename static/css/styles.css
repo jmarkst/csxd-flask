@@ -37,48 +37,62 @@ html {
 }
 
 .viewer {
-    background-color: white;
-    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
     padding: 30px;
-    border-radius: 15px;
     width: 50vw;
     color: gray;
-    border: 2px solid green;
     height: 60vh;
     font-size: 120%;
 }
 
 .viewer img {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
 }
 
-.viewer a {
-    background-color: green;
-    color: white;
-    padding: 10px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-size: 90%;
+.bottombar img {
+    width: 40px;
+    height: 40px;
 }
 
 .sidebar {
     height: 95vh;
-    width: 25%;
+    width: 20vw;
     background-color: rgba(180, 180, 180, 0.7);
-    border-radius: 20px;
+    border-radius: 10px;
     position: fixed;
     margin: 10px;
 }
 
+.margin-lg {
+    margin: 10px;
+}
+
 .bottombar {
-    height: 95vh;
-        width: 25%;
-        background-color: rgba(180, 180, 180, 0.7);
-        border-radius: 20px;
-        position: fixed;
-        margin: 10px;
-        bottom: 0;
+    height: fit-content;
+    width: fit-content;
+    background-color: rgba(180, 180, 180, 0.7);
+    border-radius: 10px;
+    position: fixed;
+    margin: 0;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    padding: 10px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.bottombar a {
+    background-color: green;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-decoration: none;
 }
 
 .left {
