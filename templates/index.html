@@ -16,10 +16,8 @@
                 </div>
             </div>
             <div class="sidebar left bd-left">
-                <a class="centered" href="">
-                    <img class="icon" src="../static/raw/chevron.svg"/>
-                </a>
-                <div class="items">
+                <img class="icon centered" src="../static/raw/chevron.svg"onclick="onSidebarClick('left-sidebar');"/>
+                <div class="items hide" id="left-sidebar">
                     <div class="margined text-gray" id="noitems">
                         <div class="card">
                             <div class="card-header">
@@ -45,14 +43,12 @@
                 </div>
             </div>
             <div class="sidebar right bd-right">
-                <a class="centered" href="">
-                    <img class="icon" src="../static/raw/chevron.svg"/>
-                </a>
-                <div class="items">
+                <img class="icon centered rotate" src="../static/raw/chevron.svg" onclick="onSidebarClick('right-sidebar');"/>
+                <div class="items hide" id="right-sidebar">
                     <div class="margined text-gray" id="noitems">
                         <div class="card">
                             <div class="card-header">
-                                <a href="" class="pill">Cabbage</a>
+                                <p class="pill">Cabbage</p>
                             </div>
                             <div class="card-body">
                                 <h6>INFORMATION</h6>
@@ -71,7 +67,7 @@
                     <div class="margined text-gray" id="noitems">
                         <div class="card">
                             <div class="card-header">
-                                <a href="" class="pill">Cabbage</a>
+                                <p class="pill">Cabbage</p>
                             </div>
                             <div class="card-body">
                                 <h6>INFORMATION</h6>
@@ -90,7 +86,7 @@
                 </div>
             </div>
             <div class="bottombar">
-                <div class="row margin-lg centered" id="loading">
+                <div class="row margin-lg centered hide" id="loading">
                     <img src="../static/raw/loading.svg" />
                     Rendering boxes...
                 </div>
@@ -100,5 +96,6 @@
                 </div>
             </div>
         </div>
+        <script src="../static/js/ui.js"></script>
     </body>
 </html>
