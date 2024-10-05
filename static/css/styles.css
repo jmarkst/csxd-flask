@@ -13,6 +13,12 @@ html {
     display: none !important;
 }
 
+canvas {
+    max-width: 80vw;
+    max-height: 80vh;
+    padding: 20px;
+}
+
 .icon {
     width: 20px;
     height: 20px;
@@ -161,7 +167,7 @@ html {
     text-decoration: none;
 }
 
-.card-body .btn:hover, .bottombar a:hover {
+.card-body .btn:hover, .bottombar a:hover, .custom-file-upload:hover {
     background-color: transparent;
     border: 3px solid green;
     font-weight: 900;
@@ -224,12 +230,13 @@ html {
     gap: 10px;
 }
 
-.bottombar a {
+.bottombar a, .custom-file-upload {
     background-color: green;
     color: white;
     padding: 20px;
     border-radius: 10px;
     text-decoration: none;
+    border: none;
 }
 
 .left {

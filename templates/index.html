@@ -12,7 +12,8 @@
         <div class="wrapper container">
             <div class="viewer">
                 <div class="centered">
-                    <img src="../static/raw/image.svg"/>
+                    <img src="../static/raw/image.svg" id="placeholder"/>
+                    <canvas id="canvas" class="hide"/>
                 </div>
             </div>
             <div class="sidebar left bd-left">
@@ -87,15 +88,16 @@
             </div>
             <div class="bottombar">
                 <div class="row margin-lg centered hide" id="loading">
-                    <img src="../static/raw/loading.svg" />
-                    Rendering boxes...
+                    Please wait...
                 </div>
                 <div class="centered row">
-                    <a href="" class="">Upload photo</a>
+                    <input type="file" id="imageUpload" value="Select an image" accept="image/*">
+                    <button id="submitBtn" class="custom-file-upload">Upload image</button>
                     <a href="" class="">Use a camera</a>
                 </div>
             </div>
         </div>
         <script src="../static/js/ui.js"></script>
+        <script src="../static/js/upload.js"></script>
     </body>
 </html>
