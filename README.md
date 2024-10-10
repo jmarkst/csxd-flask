@@ -1,7 +1,7 @@
 This is the repository of the source code for the research project entitled "TBA" by CSXD, a group of four Fourth Year Computer Science students of Adamson University, Manila.
 
 **CSXD Group Members**
-* ALVARO, Maki Andrei
+* ALVARO, Maki Andre
 * LACSON, David Isaac
 * PASTRO, Josh Vincent
 * SANTOS, Hose Marco
