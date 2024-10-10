@@ -1,0 +1,154 @@
+{
+    "broccoli": {
+        "description": "Lorem ipsum",
+        "links": {
+            "usda": "test",
+            "britannica": "test",
+            "enwiki": "test"
+        },
+        "nutrients": {
+            "water": {
+                "value": 90,
+                "unit": "g"
+            },
+            "protein": {
+                "value": 2.57,
+                "unit": "g"
+            },
+            "carbohydrates": {
+                "value": 6.27,
+                "unit": "g"
+            },
+            "fiber": {
+                "value": 2.4,
+                "unit": "g"
+            },
+            "sugar": {
+                "value": 1.4,
+                "unit": "g"
+            },
+            "calcium": {
+                "value": 46,
+                "unit": "mg"
+            },
+            "iron": {
+                "value": 0.69,
+                "unit": "mg"
+            },
+            "magnesium": {
+                "value": 21,
+                "unit": "mg"
+            },
+            "sodium": {
+                "value": 36,
+                "unit": "mg"
+            },
+            "potassium": {
+                "value": 303,
+                "unit": "mg"
+            },
+            "zinc": {
+                "value": 0.42,
+                "unit": "mg"
+            },
+            "c": {
+                "value": 91.3,
+                "unit": "mg"
+            },
+            "b6": {
+                "value": 0.191,
+                "unit": "mg"
+            },
+            "a": {
+                "value": 8,
+                "unit": "mcg"
+            },
+            "e": {
+                "value": 0.15,
+                "unit": "mcg"
+            }
+        },
+        "per": "100g",
+        "source": {
+            "name": "USDA",
+            "link": "test",
+            "date": "October 2024"
+        }
+    },
+    "cabbage": {
+        "description": "Lorem ipsum",
+        "links": {
+            "usda": "test",
+            "britannica": "test",
+            "enwiki": "test"
+        },
+        "nutrients": {
+            "water": {
+                "value": 90,
+                "unit": "g"
+            },
+            "protein": {
+                "value": 2.57,
+                "unit": "g"
+            },
+            "carbohydrates": {
+                "value": 6.27,
+                "unit": "g"
+            },
+            "fiber": {
+                "value": 2.4,
+                "unit": "g"
+            },
+            "sugar": {
+                "value": 1.4,
+                "unit": "g"
+            },
+            "calcium": {
+                "value": 46,
+                "unit": "mg"
+            },
+            "iron": {
+                "value": 0.69,
+                "unit": "mg"
+            },
+            "magnesium": {
+                "value": 21,
+                "unit": "mg"
+            },
+            "sodium": {
+                "value": 36,
+                "unit": "mg"
+            },
+            "potassium": {
+                "value": 303,
+                "unit": "mg"
+            },
+            "zinc": {
+                "value": 0.42,
+                "unit": "mg"
+            },
+            "c": {
+                "value": 91.3,
+                "unit": "mg"
+            },
+            "b6": {
+                "value": 0.191,
+                "unit": "mg"
+            },
+            "a": {
+                "value": 8,
+                "unit": "mcg"
+            },
+            "e": {
+                "value": 0.15,
+                "unit": "mcg"
+            }
+        },
+        "per": "100g",
+        "source": {
+            "name": "USDA",
+            "link": "test",
+            "date": "October 2024"
+        }
+    }
+}

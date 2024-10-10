@@ -5,6 +5,42 @@
     font-family: "Lexend", sans-serif;
 }
 
+/* Target the entire scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+    /* Width of the vertical scrollbar */
+    height: 12px;
+    /* Height of the horizontal scrollbar */
+}
+
+/* Track (the background of the scrollbar) */
+::-webkit-scrollbar-track {
+    background: transparent;
+    /* Track color */
+    border-radius: 10px;
+    /* Round track corners */
+}
+
+/* Handle (the draggable part of the scrollbar) */
+::-webkit-scrollbar-thumb {
+    background: #c2c2c2;
+    /* Handle color */
+    border-radius: 10px;
+    /* Round handle corners */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Darker color on hover */
+}
+
+/* Optional: Style the corner (where both scrollbars meet) */
+::-webkit-scrollbar-corner {
+    background: transparent;
+    /* Color for the scrollbar corner */
+}
+
 html {
     height: 100vh;
 }
@@ -106,6 +142,7 @@ canvas {
     padding: 10px;
     display: flex;
     gap: 10px;
+    z-index: 99 !important;
 }
 
 .text-gray {
@@ -254,4 +291,10 @@ canvas {
 
 .addtop-sm {
     margin-top: 10px;
+}
+
+.gapped {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }

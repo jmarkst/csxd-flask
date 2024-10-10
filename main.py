@@ -1,6 +1,11 @@
 from flask import Flask, request, jsonify, render_template
 from ultralytics import YOLO
+import os
+import requests
 from PIL import Image
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -36,6 +41,22 @@ def upload():
             })
 
     return jsonify({'boxes': boxes})
+
+@app.route('/nutrition', methods=['GET'])
+def handle_request():
+    # Get the vegetable from the query string
+    vegetable = request.args.get('vegetable')
+
+    # You can now use this vegetable to make an API call or perform any logic
+    api_key = os.getenv("API_KEY")
+
+    # Example: Make a mock API call using the vegetable name
+    api_response = requests.get(
+        f"https://api.nal.usda.gov/fdc/v1/food/{vegetable}?API_KEY={api_key}"
+    )
+
+    # Return the response back to the frontend
+    return jsonify(api_response.json())
 
 if __name__ == '__main__':
     app.run(debug=True)
