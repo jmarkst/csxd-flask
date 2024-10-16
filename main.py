@@ -12,8 +12,8 @@ load_dotenv()
 app = Flask(__name__)
 
 # Load the YOLOv8 model
-model = YOLO("static/raw/models/best.pt")  # Replace with your trained YOLOv8 model path
-# model = YOLO('yolov8n.pt')
+# model = YOLO("static/raw/models/best.pt")  # Replace with your trained YOLOv8 model path
+model = YOLO('yolov8n.pt')
 
 @app.route('/')
 def index():
@@ -81,38 +81,63 @@ def frame():
         detections = annotate(frame)
         return detections
 
-camera = cv2.VideoCapture(1)  # Access the webcam (use 0 for default)
+camera = cv2.VideoCapture(0)  # Capture from webcam
+latest_detections = []  # To store the latest detections
 
 def generate_frames():
+    global latest_detections
     while True:
-        success, frame = camera.read()  # Capture a frame from the webcam
+        success, frame = camera.read()  # Capture frame-by-frame
         if not success:
             break
         else:
-            # YOLOv8 inference with streaming
+            # YOLOv8 inference with stream=True
             results = model(frame, stream=True)
 
+            # Initialize a temporary list to store detections for this frame
+            current_detections = []
+
+            # Process results and draw bounding boxes
             for result in results:
-                # Process the results as they come in stream
                 detections = result.boxes.data.cpu().numpy()
 
-                # Draw bounding boxes on the frame
+                # Iterate over detections and process them
                 for det in detections:
                     x1, y1, x2, y2, score, class_id = det
-                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-                    cv2.putText(frame, f'{score:.2f}', (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    current_detections.append({
+                        "x1": int(x1),
+                        "y1": int(y1),
+                        "x2": int(x2),
+                        "y2": int(y2),
+                        "confidence": float(score),
+                        "class": int(class_id)
+                    })
 
-            # Encode the frame to JPEG format
+                    # Draw bounding box on the frame
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                    label = f'{model.names[int(class_id)]} {score:.2f}'
+                    cv2.putText(frame, label, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+            # If there are detections, update the global latest_detections
+            if current_detections:
+                latest_detections = current_detections
+
+            # Encode the frame in JPEG format
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
 
-            # Stream the frame to the frontend
+            # Stream the frame as a multipart response
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/detections')
+def detections():
+    # Return the latest detections as JSON (if no new detections, return the last known ones)
+    return jsonify(latest_detections)
 
 
 if __name__ == '__main__':

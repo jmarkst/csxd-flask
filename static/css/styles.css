@@ -5,6 +5,11 @@
     font-family: "Lexend", sans-serif;
 }
 
+.fullvideo {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
 /* Target the entire scrollbar */
 ::-webkit-scrollbar {
     width: 12px;
