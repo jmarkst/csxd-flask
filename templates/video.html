@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLOv8 Stream Detection</title>
+    <style>
+        video, canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        button {
+            position: relative;
+            top: 500px;
+        }
+    </style>
+</head>
+<body>
+    <img id="video" width="640" height="480" />
+    <button id="pause-btn">Pause</button>
+
+    <script>
+        const video = document.getElementById('video');
+        const pauseBtn = document.getElementById('pause-btn');
+
+        let isPaused = false;
+
+        // Stream the video from the Flask backend
+        function streamVideo() {
+            if (!isPaused) {
+                video.src = '/video_feed';  // Stream the video feed directly from Flask
+            }
+        }
+
+        // Pause/unpause functionality
+        pauseBtn.addEventListener('click', () => {
+            if (isPaused) {
+                pauseBtn.textContent = 'Pause';
+                isPaused = false;
+                streamVideo();  // Resume video stream
+            } else {
+                pauseBtn.textContent = 'Unpause';
+                isPaused = true;
+                video.src = '';  // Stop the video stream
+            }
+        });
+
+        // Start streaming the video when the page loads
+        streamVideo();
+    </script>
+</body>
+</html>
