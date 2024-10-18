@@ -91,6 +91,7 @@ function drawInformationUsingCached(body, boxes, veget) {
 
 async function cacheUSDAInfo() {
     const veg = [ 747447, 2346407, 2685573 ];
+    var usdaStart = performance.now()
     const loading = document.getElementById('loading');
     loading.classList.toggle('hide');
     const description = "Caching information from USDA FoodCentral..."
@@ -115,6 +116,9 @@ async function cacheUSDAInfo() {
     }
     loading.classList.toggle('hide');
     console.log(cache)
+    var usdaEndTime = performance.now()
+    var usdaTime = usdaEndTime - usdaStart
+    console.log("USDA API caching time: " + usdaTime + "ms")
 }
 
 const logic = cacheUSDAInfo().then(() => {

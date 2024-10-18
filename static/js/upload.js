@@ -13,15 +13,34 @@ document.getElementById('submitBtn').addEventListener('click', function () {
     formData.append('image', file);
 
     const xhr = new XMLHttpRequest();
+    var startTime = performance.now();
     xhr.open('POST', '/upload', true);
     xhr.onload = function () {
         if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
+            var endTime = performance.now(); 
+            var response = JSON.parse(xhr.responseText);
+            const inferenceTime = response.inferenceTime;
+            response = response.results;
+            //console.log(response)
             document.getElementById('canvas').classList.remove('hide');
             document.getElementById('placeholder').classList.add('hide');
-            drawBoxes(response.boxes);
-            showDetections(response.boxes);
-            drawLeftSidebar(response.boxes);
+            var renderingTimeStart = performance.now(); 
+            drawBoxes(response);
+            showDetections(response);
+            var apiCallStart = performance.now(); 
+            drawLeftSidebar(response);
+            var apiCallEnd = performance.now(); 
+            var renderingTimeEnd = performance.now();
+
+            // STATISTICS
+            var roundTripTime = endTime - startTime;
+            var renderTime = renderingTimeEnd - renderingTimeStart;
+            var apiCallTime = apiCallEnd - apiCallStart;
+            console.log("Inference Time: " + inferenceTime + "ms");
+            console.log("Roundtrip Time: " + roundTripTime + "ms");
+            console.log("Rendering Time: " + renderTime + "ms");
+            console.log("API Response Time: " + apiCallTime + "ms");
+
         } else {
             console.error('Error uploading image');
         }

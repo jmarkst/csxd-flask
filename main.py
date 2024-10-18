@@ -6,7 +6,7 @@ from PIL import Image
 from dotenv import load_dotenv
 import numpy as np
 import cv2
-from decimal import Decimal
+import time
 
 load_dotenv()
 
@@ -32,13 +32,25 @@ def upload():
     file = request.files['image']
     # Process the image with the YOLOv8 model
     image = Image.open(file.stream)
+    inferenceTimeStart = time.time()
     results = model(image)
     annotate = annotations(results)
-    return annotate
+    inferenceTimeEnd = time.time()
+    inferenceTime = inferenceTimeEnd - inferenceTimeStart
+    return jsonify({
+        'results': annotate,
+        'inferenceTime': inferenceTime
+    })
 
 def annotate(frame):
+    inferenceTimeStart = time.time()
     results = model(frame)
-    return annotations(results)
+    inferenceTimeEnd = time.time()
+    inferenceTime = inferenceTimeEnd - inferenceTimeStart
+    return jsonify({
+        'results': annotations(results),
+        'inferenceTime': inferenceTime
+    })
 
 def annotations(results):
     # Convert results to JSON-friendly format
@@ -56,7 +68,7 @@ def annotations(results):
                     'class': int(box.cls)
                 })
 
-    return jsonify({'boxes': boxes})
+    return boxes
 
 @app.route('/nutrition', methods=['GET'])
 def handle_request():
@@ -83,23 +95,50 @@ def frame():
         detections = annotate(frame)
         return detections
 
+def draw_box(frame, detection):
+    # Simplify bounding box and text rendering for better performance
+    x1, y1, x2, y2 = detection['x1'], detection['y1'], detection['x2'], detection['y2']
+    confidence = detection['confidence']
+    cls = detection['class']
+    
+    # Draw bounding box with reduced thickness and faster rendering
+    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 1)  # Thinner lines
+    label = f'{model.names[cls]} {confidence:.2f}'
+    
+    # Render a smaller text size
+    cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
+
 camera = cv2.VideoCapture(0)  # Capture from webcam
 latest_detections = []  # To store the latest detections
+videoStartTime = 0
+videoFrames = 0
+
+latest_detections = []  # This will store the latest detection boxes
+frame_count = 0  # Keep track of frames
+skip_inference = 5  # Number of frames to skip between inferences
 
 def generate_frames():
     global latest_detections
+    prev_frame_time = 0
+    new_frame_time = 0
+    frame_count = 0  # Keep track of frames
+
     while True:
-        success, frame = camera.read()  # Capture frame-by-frame
+        success, frame = camera.read()
         if not success:
-            break
-        else:
-            # YOLOv8 inference with stream=True
+            continue
+
+        frame = cv2.resize(frame, (640, 480))  # Resize the frame to improve performance
+
+        frame_count += 1
+        new_frame_time = time.time()
+
+        # Perform YOLOv8 inference only every 5th frame
+        if frame_count % skip_inference == 0:
             results = model(frame, stream=True)
+            current_detections = []  # Temporary storage for detections in this frame
 
-            # Initialize a temporary list to store detections for this frame
-            current_detections = []
-
-            # Process results and draw bounding boxes
+            # Process results
             for result in results:
                 for box in result.boxes:
                     if box.conf >= 0.7:
@@ -113,23 +152,40 @@ def generate_frames():
                             'class': int(box.cls)
                         })
 
+            # Update global latest detections with current detections
+            latest_detections = current_detections
 
-                        # Draw bounding box on the frame
-                        cv2.rectangle(frame, (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (0, 255, 0), 2)
-                        label = f'{model.names[int(box.cls)]} {float(box.conf):.2f}'
-                        cv2.putText(frame, label, (int(xyxy[0]), int(xyxy[1]) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        # Render the current frame using the latest detections
+        for detection in latest_detections:
+            draw_box(frame, detection)
 
-            # If there are detections, update the global latest_detections
-            if current_detections:
-                latest_detections = current_detections
+        # FPS calculation
+        fps = 1 / (new_frame_time - prev_frame_time)
+        prev_frame_time = new_frame_time
 
-            # Encode the frame in JPEG format
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
+        # Display FPS on the frame
+        cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-            # Stream the frame as a multipart response
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        # Encode the frame in JPEG format
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+def draw_box(frame, detection):
+    # Simplify bounding box and text rendering for better performance
+    x1, y1, x2, y2 = detection['x1'], detection['y1'], detection['x2'], detection['y2']
+    confidence = detection['confidence']
+    cls = detection['class']
+
+    # Draw bounding box
+    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    label = f'{model.names[cls]} {confidence:.2f}'
+
+    # Render text label
+    cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
 @app.route('/video_feed')
 def video_feed():
