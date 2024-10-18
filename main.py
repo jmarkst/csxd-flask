@@ -6,14 +6,15 @@ from PIL import Image
 from dotenv import load_dotenv
 import numpy as np
 import cv2
+from decimal import Decimal
 
 load_dotenv()
 
 app = Flask(__name__)
 
 # Load the YOLOv8 model
-# model = YOLO("static/raw/models/best.pt")  # Replace with your trained YOLOv8 model path
-model = YOLO('yolov8n.pt')
+model = YOLO("static/raw/models/best.pt")  # Replace with your trained YOLOv8 model path
+#model = YOLO('yolov8n.pt')
 
 @app.route('/')
 def index():
@@ -44,15 +45,16 @@ def annotations(results):
     boxes = []
     for result in results:
         for box in result.boxes:
-            xyxy = box.xyxy[0].tolist()  # Extract coordinates as a list [x1, y1, x2, y2]
-            boxes.append({
-                'x1': int(xyxy[0]),
-                'y1': int(xyxy[1]),
-                'x2': int(xyxy[2]),
-                'y2': int(xyxy[3]),
-                'confidence': float(box.conf),
-                'class': int(box.cls)
-            })
+            if box.conf >= 0.7:
+                xyxy = box.xyxy[0].tolist()  # Extract coordinates as a list [x1, y1, x2, y2]
+                boxes.append({
+                    'x1': int(xyxy[0]),
+                    'y1': int(xyxy[1]),
+                    'x2': int(xyxy[2]),
+                    'y2': int(xyxy[3]),
+                    'confidence': float(box.conf),
+                    'class': int(box.cls)
+                })
 
     return jsonify({'boxes': boxes})
 
@@ -99,24 +101,23 @@ def generate_frames():
 
             # Process results and draw bounding boxes
             for result in results:
-                detections = result.boxes.data.cpu().numpy()
+                for box in result.boxes:
+                    if box.conf >= 0.7:
+                        xyxy = box.xyxy[0].tolist()  # Extract coordinates as a list [x1, y1, x2, y2]
+                        current_detections.append({
+                            'x1': int(xyxy[0]),
+                            'y1': int(xyxy[1]),
+                            'x2': int(xyxy[2]),
+                            'y2': int(xyxy[3]),
+                            'confidence': float(box.conf),
+                            'class': int(box.cls)
+                        })
 
-                # Iterate over detections and process them
-                for det in detections:
-                    x1, y1, x2, y2, score, class_id = det
-                    current_detections.append({
-                        "x1": int(x1),
-                        "y1": int(y1),
-                        "x2": int(x2),
-                        "y2": int(y2),
-                        "confidence": float(score),
-                        "class": int(class_id)
-                    })
 
-                    # Draw bounding box on the frame
-                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-                    label = f'{model.names[int(class_id)]} {score:.2f}'
-                    cv2.putText(frame, label, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                        # Draw bounding box on the frame
+                        cv2.rectangle(frame, (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (0, 255, 0), 2)
+                        label = f'{model.names[int(box.cls)]} {float(box.conf):.2f}'
+                        cv2.putText(frame, label, (int(xyxy[0]), int(xyxy[1]) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
             # If there are detections, update the global latest_detections
             if current_detections:
