@@ -1,4 +1,4 @@
-
+var apiSum = 0;
 const classes = [ 'broccoli', 'cabbage', 'cauliflower' ];
 document.getElementById('submitBtn').addEventListener('click', function () {
     const imageInput = document.getElementById('imageUpload');
@@ -21,6 +21,7 @@ document.getElementById('submitBtn').addEventListener('click', function () {
             var response = JSON.parse(xhr.responseText);
             const inferenceTime = response.inferenceTime;
             response = response.results;
+            var roundTripTime = endTime - startTime;
             //console.log(response)
             document.getElementById('canvas').classList.remove('hide');
             document.getElementById('placeholder').classList.add('hide');
@@ -28,15 +29,14 @@ document.getElementById('submitBtn').addEventListener('click', function () {
             drawBoxes(response);
             showDetections(response);
             var apiCallStart = performance.now(); 
+            
             drawLeftSidebar(response);
-            var apiCallEnd = performance.now(); 
             var renderingTimeEnd = performance.now();
 
             // STATISTICS
-            var roundTripTime = endTime - startTime;
             var renderTime = renderingTimeEnd - renderingTimeStart;
-            var apiCallTime = apiCallEnd - apiCallStart;
-            console.log("Inference Time: " + inferenceTime + "ms");
+            var apiCallTime = apiSum;
+            console.log("Inference Time: " + inferenceTime + "s");
             console.log("Roundtrip Time: " + roundTripTime + "ms");
             console.log("Rendering Time: " + renderTime + "ms");
             console.log("API Response Time: " + apiCallTime + "ms");
@@ -267,6 +267,7 @@ function countDetections (boxes) {
 }
 
 async function drawLeftSidebar (boxes) {
+    var renderStart = performance.now();
     const body = document.getElementById('left-body');
     body.innerHTML = "";
     const count = countDetections(boxes);
@@ -278,11 +279,13 @@ async function drawLeftSidebar (boxes) {
     var loaded = "";
 
     loading.innerHTML = description;
+    apiCalls = [];
 
     for (let x = 0; x < count.length; x++) {
         if (count[ x ] != 0) {
             try {
                 // Await the fetch request to make it "synchronous"
+                let apiStartTime = performance.now();
                 const response = await fetch(`/nutrition?vegetable=${ veg[ x ] }`, {
                     method: 'GET',
                     headers: {
@@ -290,6 +293,11 @@ async function drawLeftSidebar (boxes) {
                     }
                 });
                 const data = await response.json();  // Await the JSON parsing as well
+                let apiEndTime = performance.now();
+                let api = apiEndTime - apiStartTime;
+                console.log("API CALL " + x + ": " + api + "ms");
+                apiCalls.push(api);
+                console.log(apiCalls);
                 console.log(data)
                 drawInformation(body, boxes, x, count[ x ], data);
                 loaded = `<br><small>${ x + 1 } loaded</small>`
@@ -302,6 +310,16 @@ async function drawLeftSidebar (boxes) {
 
     loading.innerHTML = "Please wait"
     loading.classList.toggle('hide');
+    var sum = 0;
+    for (var x = 0; x < apiCalls.length;  x++) {
+        sum += apiCalls[ x ];
+    }
+    sum = sum / apiCalls.length;
+    var renderEnd = performance.now()
+    var renderTime = renderEnd - renderStart;
+    console.log("TRUE Rendering Time: " + renderTime + "ms");
+    console.log("TRUE API Response Time: " + sum + "ms");
+    apiCalls = []
 }
 
 

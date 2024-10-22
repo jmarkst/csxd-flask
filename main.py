@@ -13,7 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Load the YOLOv8 model
-model = YOLO("static/raw/models/best.pt")  # Replace with your trained YOLOv8 model path
+model = YOLO("static/raw/models/ccbv2c.pt")  # Replace with your trained YOLOv8 model path
 #model = YOLO('yolov8n.pt')
 
 @app.route('/')
