@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../static/css/styles.css">
+    </head>
+    <body>
+        <div class="wrapper container">
+            <div class="viewer">
+                <div class="centered">
+                    <img src="/video_feed" class="fullvideo"/>
+                </div>
+            </div>
+            <div class="sidebar left bd-left">
+                <img class="icon centered" src="../static/raw/chevron.svg"onclick="onSidebarClick('left-sidebar');"/>
+                <div class="items hide" id="left-sidebar">
+                    <div class="margined text-gray gapped"  id="left-body">
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar right bd-right">
+                <img class="icon centered rotate" src="../static/raw/chevron.svg" onclick="onSidebarClick('right-sidebar');"/>
+                <div class="items hide" id="right-sidebar">
+                </div>
+            </div>
+            <div class="bottombar">
+                <div class="row margin-lg centered hide" id="loading">
+                    Please wait...
+                </div>
+                <!--
+                <div class="centered row">
+                    <button id="submitBtn" class="custom-file-upload">Pause frame</button>
+                    <!--a href="" class="">Use a camera</a> Wag muna hanggat wala pa
+                </div>-->
+            </div>
+        </div>
+        <script src="../static/js/ui.js"></script>
+        <script src="../static/js/upload.js"></script>
+        <script src="../static/js/video.js"></script>
+    </body>
+</html>
