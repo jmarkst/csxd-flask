@@ -214,15 +214,26 @@ function showDetections (boxes) {
             conflabel.innerText = "CONFIDENCE";
             const conf = document.createElement('div');
             conf.classList.add('col', 'full');
-            conf.innerText = `${ (box.confidence * 100).toFixed(1) }%`;
+            conf.innerText = `${ (box.confidence * 100).toFixed(2) }%`;
+            const weightcont = document.createElement('div');
+            weightcont.classList.add('row', 'full');
+            const weightlabel = document.createElement('div');
+            weightlabel.classList.add('col', 'full', 'headtext');
+            weightlabel.innerText = "WEIGHT IN GRAMS";
+            const weightinput = document.createElement('input');
+            weightinput.classList.add('col', 'full');
+            weightinput.in
 
             // append children
             coordscont.appendChild(coordslabel);
             coordscont.appendChild(coords);
             confcont.appendChild(conflabel);
             confcont.appendChild(conf);
+            weightcont.appendChild(weightlabel);
+            weightcont.appendChild(weightinput);
             cardbody.appendChild(coordscont);
             cardbody.appendChild(confcont);
+            cardbody.appendChild(weightcont);
             cardhead.appendChild(classpill);
             card.appendChild(cardhead);
             card.appendChild(cardbody);
@@ -348,10 +359,14 @@ function drawInformation (body, boxes, veget, count, response) {
     const link = response.fdcId;
     const disclaimer = `<small><b>Data from USDA FoodCentral.</b><br>For a complete nutritional information,<b><a href='https://fdc.nal.usda.gov/fdc-app.html#/food-details/${link}/nutrients' target='_blank' rel='noopener noreferrer'>click here</a></b></small>`; // description
     const fooditem = `<h6>${response.description}</h6>`
+
     cardbody.innerHTML = disclaimer + "<br>" + fooditem;
     const h6 = document.createElement('h6');
     h6.innerHTML = "NUTRITIONAL DATA";
+    const small = document.createElement("small");
+    small.innerHTML = "<b>per 100g (total)</b><br>You can adjust the weights of individual detections for a more comprehensive estimation.";
     cardbody.appendChild(h6);
+    cardbody.appendChild(small);
 
     console.log(veget)
     console.log(nuts[veget])
@@ -373,7 +388,8 @@ function drawInformation (body, boxes, veget, count, response) {
 
         const value = document.createElement('div');
         value.classList.add('col', 'full');
-        value.innerHTML = `${ response.foodNutrients[ nutrientIndex ].amount } ${ response.foodNutrients[ nutrientIndex ].nutrient.unitName }`;
+        const amount = response.foodNutrients[ nutrientIndex ].amount.toFixed(2);
+        value.innerHTML = `${ amount }${ response.foodNutrients[ nutrientIndex ].nutrient.unitName }`;
         row.appendChild(value);
 
         cardbody.appendChild(row);
