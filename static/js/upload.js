@@ -1,3 +1,23 @@
+function disableAllInputs () {
+    const inputs = document.querySelectorAll('input'); // Select all input elements in the form
+    inputs.forEach(input => {
+        input.disabled = true; // Set disabled to true
+    });
+}
+
+disableAllInputs()
+var stateCheck = true;
+
+// Function to enable all inputs
+function enableAllInputs () {
+    const inputs = document.querySelectorAll('input'); // Select all input elements in the form
+    inputs.forEach(input => {
+        input.disabled = false; // Set disabled to false
+    });
+}
+
+var showSingleOnly = true;
+
 var apiSum = 0;
 const classes = [ 'broccoli', 'cabbage', 'cauliflower' ];
 var confidence = 0.7;
@@ -6,6 +26,10 @@ var toShow = [ true, true, true ];
 var drawLabel = true;
 var lineWidth = 4;
 var colors = [ 'red', 'red', 'red' ];
+var counted = [ 0, 0, 0 ];
+var datum = [ 0, 0, 0 ];
+var cache = [];
+const leftbody = document.getElementById('left-body');
 
 var class0colorElem = document.getElementById('class0color');
 var class1colorElem = document.getElementById('class1color');
@@ -34,7 +58,171 @@ confScroll.addEventListener('input', () => {
     //console.log(prevResponse);
     drawBoxes(prevResponse);
     showDetections(prevResponse);
+    countDetections(prevResponse);
+    drawLeftSidebarCached(prevResponse)
+    //drawInformation(body, boxes, veget, count, response)
 });
+
+function drawLeftSidebarCached (boxes) {
+    const body = document.getElementById('left-body');
+    body.innerHTML = "";
+    counted = countDetections(boxes);
+    for (let x = 0; x < counted.length; x++) {
+        if (counted[ x ] != 0) {
+            //console.log(counted);
+            //console.log(cache[ x ]);
+            drawInformationUsingCached(body, boxes, x);
+        }
+    }
+}
+
+function drawInformationUsingCached (body, boxes, veget) {
+    const classes = [ "broccoli", "cabbage", "cauliflower" ];
+    const veg = [ 747447, 2346407, 2685573 ];
+    const nuts = [
+        [ 1, 5, 10, 12, 24, 25, 26, 28, 29, 30, 35, 40, 42, 50 ],
+        [ 1, 5, 9, 11, 12, 13, 15, 16, 17, 22, 23 ],
+        [ 1, 5, 9, 12, 13, 14, 16, 17, 18 ]
+    ];
+    console.log(cache[ 1 ].foodNutrients);
+    const card = document.createElement('div');
+    card.classList.add('card');
+    const header = document.createElement('div');
+    header.classList.add('card-header');
+    const cardbody = document.createElement('div');
+    cardbody.classList.add('card-body');
+
+    const vegetable = document.createElement('p');
+    vegetable.classList.add('pill');
+    vegetable.innerHTML = `${ classes[ veget ] } (${counted[veget]})`; // 24 detections
+
+    header.appendChild(vegetable);
+    card.appendChild(header);
+
+    const link = cache[ veget ].fdcId;
+    const disclaimer = `<small><b>Data from USDA FoodCentral.</b><br>For a complete nutritional information,<b><a href='https://fdc.nal.usda.gov/fdc-app.html#/food-details/${ link }/nutrients' target='_blank' rel='noopener noreferrer'>click here</a></b></small>`; // description
+    const fooditem = `<b>${ cache[ veget ].description }</b>`;
+    cardbody.innerHTML = disclaimer + "<br>" + fooditem;
+    const h6 = document.createElement('h6');
+    
+    const checkSingleCont = document.createElement('div');
+    checkSingleCont.classList.add('row', 'full');
+    const checkSingle = document.createElement('input');
+    checkSingle.type = 'radio'
+    const checkSingleLabel = document.createElement('p');
+    checkSingleLabel.innerHTML = "Show single values"
+    checkSingle.checked = stateCheck ? true : false;
+    checkSingle.name = 'leftValues';
+    checkSingle.addEventListener('click', () => {
+        if (checkSingle.checked) {
+            showSingleOnly = true;
+            checkSingle.checked = true;
+            stateCheck = true;
+            console.log(showSingleOnly);
+            drawLeftSidebarCached(prevResponse);
+        }
+    })
+    checkSingleCont.appendChild(checkSingle);
+    checkSingleCont.appendChild(checkSingleLabel);
+    cardbody.appendChild(checkSingleCont)
+
+    const checkMultipleCont = document.createElement('div');
+    checkMultipleCont.classList.add('row', 'full')
+    const checkMultiple = document.createElement('input');
+    checkMultiple.type = 'radio';
+    const checkMultipleLabel = document.createElement('p');
+    checkMultipleLabel.innerHTML = "Show calculated values"
+    checkMultiple.name = 'leftValues'
+    checkMultiple.checked = stateCheck == false ? true : false;
+    checkMultiple.addEventListener('click', () => {
+        if (checkMultiple.checked) {
+            showSingleOnly = false;
+            checkMultiple.checked = true;
+            stateCheck = false;
+            console.log(showSingleOnly);
+            drawLeftSidebarCached(prevResponse);
+        }
+    })
+    checkMultipleCont.appendChild(checkMultiple);
+    checkMultipleCont.appendChild(checkMultipleLabel);
+    cardbody.appendChild(checkMultipleCont)
+
+
+    h6.innerHTML = "NUTRITIONAL DATA";
+    cardbody.appendChild(h6);
+
+    for (var x = 0; x < nuts[ veget ].length; x++) {
+        // Check if the nutrient exists in the response
+        const nutrientIndex = nuts[ veget ][ x ];
+        if (!cache[ veget ].foodNutrients[ nutrientIndex ]) {
+            console.error(`Nutrient data missing at index ${ nutrientIndex }`);
+            continue;
+        }
+
+        const row = document.createElement('div');
+        row.classList.add('row', 'full');
+
+        const headtext = document.createElement('div');
+        headtext.classList.add('col', 'full', 'headtext');
+        headtext.innerHTML = `${ cache[ veget ].foodNutrients[ nutrientIndex ].nutrient.name }`;
+        row.appendChild(headtext);
+
+        const value = document.createElement('div');
+        value.classList.add('col', 'full');
+        if (showSingleOnly) {
+            value.innerHTML = `${ cache[ veget ].foodNutrients[ nutrientIndex ].amount }${ cache[ veget ].foodNutrients[ nutrientIndex ].nutrient.unitName }`;
+        } else {
+            var amount = cache[ veget ].foodNutrients[ nutrientIndex ].amount
+            var calc = amount * counted[ veget ];
+            value.innerHTML = `${ calc.toFixed(2) }${ cache[ veget ].foodNutrients[ nutrientIndex ].nutrient.unitName }`;
+        }
+        row.appendChild(value);
+
+        cardbody.appendChild(row);
+    }
+
+    card.appendChild(cardbody);
+
+    body.append(card);
+}
+
+async function cacheUSDAInfo () {
+    const veg = [ 747447, 2346407, 2685573 ];
+    var usdaStart = performance.now();
+    const loading = document.getElementById('loading');
+    loading.classList.toggle('hide');
+    const description = "Caching information from USDA FoodCentral...";
+    var loaded = "";
+    for (let x = 0; x < 3; x++) {
+        try {
+            // Await the fetch request to make it "synchronous"
+            const response = await fetch(`/nutrition?vegetable=${ veg[ x ] }`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();  // Await the JSON parsing as well
+            console.log(data);
+            cache[ x ] = data;
+            loaded = `<br><small>${ x + 1 } cached</small>`;
+            loading.innerHTML = description + loaded;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    loading.classList.toggle('hide');
+    console.log(cache);
+    var usdaEndTime = performance.now();
+    var usdaTime = usdaEndTime - usdaStart;
+    loading.innerHTML = "Please wait..."
+    console.log("USDA API caching time: " + usdaTime + "ms");
+}
+
+const logic = cacheUSDAInfo().then(() => {
+    console.log("cached OK");
+    enableAllInputs();
+})
 
 var lineWidthScroll = document.getElementById('lineWidth');
 var lineWidthValue = document.getElementById('lineWidthValue');
@@ -104,7 +292,7 @@ document.getElementById('submitBtn').addEventListener('click', function () {
             showDetections(response);
             var apiCallStart = performance.now(); 
             
-            drawLeftSidebar(response);
+            drawLeftSidebarCached(response);
             var renderingTimeEnd = performance.now();
 
             // STATISTICS
@@ -316,25 +504,14 @@ function showDetections (boxes) {
             const conf = document.createElement('div');
             conf.classList.add('col', 'full');
             conf.innerText = `${ (box.confidence * 100).toFixed(2) }%`;
-            const weightcont = document.createElement('div');
-            weightcont.classList.add('row', 'full');
-            const weightlabel = document.createElement('div');
-            weightlabel.classList.add('col', 'full', 'headtext');
-            weightlabel.innerText = "WEIGHT IN GRAMS";
-            const weightinput = document.createElement('input');
-            weightinput.classList.add('col', 'full');
-            weightinput.in
 
             // append children
             coordscont.appendChild(coordslabel);
             coordscont.appendChild(coords);
             confcont.appendChild(conflabel);
             confcont.appendChild(conf);
-            weightcont.appendChild(weightlabel);
-            weightcont.appendChild(weightinput);
             cardbody.appendChild(coordscont);
             cardbody.appendChild(confcont);
-            cardbody.appendChild(weightcont);
             cardhead.appendChild(classpill);
             card.appendChild(cardhead);
             card.appendChild(cardbody);
@@ -375,15 +552,18 @@ function countDetections (boxes) {
         }
     });
 
+    counted = count;
+
     return count;
 }
 
 async function drawLeftSidebar (boxes) {
     var renderStart = performance.now();
-    const body = document.getElementById('left-body');
-    body.innerHTML = "";
     const count = countDetections(boxes);
     const veg = [ 747447, 2346407, 2685573 ];
+
+    const body = leftbody;
+    body.innerHTML = "";
 
     const loading = document.getElementById('loading');
     loading.classList.toggle('hide');
@@ -410,7 +590,8 @@ async function drawLeftSidebar (boxes) {
                 console.log("API CALL " + x + ": " + api + "ms");
                 apiCalls.push(api);
                 console.log(apiCalls);
-                console.log(data)
+                datum[ x ] = data;
+                console.log(datum)
                 drawInformation(body, boxes, x, count[ x ], data);
                 loaded = `<br><small>${ x + 1 } loaded</small>`
                 loading.innerHTML = description + loaded;
@@ -474,6 +655,7 @@ function drawInformation (body, boxes, veget, count, response) {
     for (var x = 0; x < nuts[veget].length; x++) {
         // Check if the nutrient exists in the response
         const nutrientIndex = nuts[ veget ][ x ];
+        console.log(response);
         if (!response.foodNutrients[ nutrientIndex ]) {
             console.error(`Nutrient data missing at index ${ nutrientIndex }`);
             continue;

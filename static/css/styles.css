@@ -223,7 +223,6 @@ canvas {
 
 .card-body .btn:hover, .bottombar a:hover, .custom-file-upload:hover {
     background-color: transparent;
-    border: 3px solid green;
     font-weight: 900;
     color: green;
 }
@@ -290,11 +289,13 @@ canvas {
 
 .bottombar a, .custom-file-upload {
     background-color: green;
+    width: 100px;
     color: white;
     padding: 20px;
     border-radius: 10px;
     text-decoration: none;
-    border: none;
+    font-weight: 700;
+    border: 3px solid green;
 }
 
 .left {
