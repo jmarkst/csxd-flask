@@ -67,11 +67,23 @@ canvas {
     padding-inline: 10px;
 }
 
+.small-icon {
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    padding: 10px 20px;
+    transform:rotate(90deg);
+}
+
 .rotate {
     transform:rotate(180deg);
 }
 
-.icon:hover {
+.rotate-90 {
+    transform:rotate(-90deg);
+}
+
+.icon:hover, .small-icon:hover {
     background-color: rgba(180, 180, 180, 0.7);
 }
 
@@ -117,8 +129,8 @@ canvas {
 }
 
 .bottombar img {
-    width: 40px;
-    height: 40px;
+    width: 20px;
+    height: 20px;
 }
 
 .sidebar a img {
@@ -259,6 +271,10 @@ canvas {
 
 .full {
     width: 100%;
+}
+
+.smaller {
+    width: 50px;
 }
 
 .headtext {

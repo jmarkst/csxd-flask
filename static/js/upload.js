@@ -1,5 +1,78 @@
 var apiSum = 0;
 const classes = [ 'broccoli', 'cabbage', 'cauliflower' ];
+var confidence = 0.7;
+var prevResponse = [];
+var toShow = [ true, true, true ];
+var drawLabel = true;
+var lineWidth = 4;
+var colors = [ 'red', 'red', 'red' ];
+
+var class0colorElem = document.getElementById('class0color');
+var class1colorElem = document.getElementById('class1color');
+var class2colorElem = document.getElementById('class2color');
+
+class0colorElem.addEventListener('input', () => {
+    colors[ 0 ] = isValidColor(class0colorElem.value) ? class0colorElem.value : 'red';
+    drawBoxes(prevResponse);
+});
+
+class1colorElem.addEventListener('input', () => {
+    colors[ 1 ] = isValidColor(class1colorElem.value) ? class1colorElem.value : 'red';
+    drawBoxes(prevResponse);
+});
+
+class2colorElem.addEventListener('input', () => {
+    colors[ 2 ] = isValidColor(class2colorElem.value) ? class2colorElem.value : 'red';
+    drawBoxes(prevResponse);
+});
+
+var confScroll = document.getElementById('confScroll');
+var confValue = document.getElementById('confValue');
+confScroll.addEventListener('input', () => {
+    confValue.innerText = (confScroll.value * 100).toFixed(1) + "%";
+    confidence = confScroll.value;
+    //console.log(prevResponse);
+    drawBoxes(prevResponse);
+    showDetections(prevResponse);
+});
+
+var lineWidthScroll = document.getElementById('lineWidth');
+var lineWidthValue = document.getElementById('lineWidthValue');
+lineWidthScroll.addEventListener('input', () => {
+    lineWidthValue.innerText = lineWidthScroll.value + "px";
+    lineWidth = lineWidthScroll.value;
+    drawBoxes(prevResponse);
+    showDetections(prevResponse);
+});
+
+var showLabelCheck = document.getElementById('showLabel');
+showLabelCheck.addEventListener('change', () => {
+    drawLabel = showLabelCheck.checked ? true : false;
+    drawBoxes(prevResponse);
+});
+
+var class0 = document.getElementById('class0');
+class0.addEventListener('change', () => {
+    toShow[ 0 ] = class0.checked ? true : false;
+    drawBoxes(prevResponse);
+    showDetections(prevResponse);
+});
+
+var class1 = document.getElementById('class1');
+class1.addEventListener('change', () => {
+    toShow[ 1 ] = class1.checked ? true : false;
+    drawBoxes(prevResponse);
+    showDetections(prevResponse);
+});
+
+var class2 = document.getElementById('class2');
+class2.addEventListener('change', () => {
+    toShow[ 2 ] = class2.checked ? true : false;
+    drawBoxes(prevResponse);
+    showDetections(prevResponse);
+    console.log(toShow);
+});
+
 document.getElementById('submitBtn').addEventListener('click', function () {
     const imageInput = document.getElementById('imageUpload');
     if (imageInput.files.length === 0) {
@@ -17,10 +90,11 @@ document.getElementById('submitBtn').addEventListener('click', function () {
     xhr.open('POST', '/upload', true);
     xhr.onload = function () {
         if (xhr.status === 200) {
-            var endTime = performance.now(); 
+            var endTime = performance.now();
             var response = JSON.parse(xhr.responseText);
             const inferenceTime = response.inferenceTime;
             response = response.results;
+            prevResponse = response;
             var roundTripTime = endTime - startTime;
             //console.log(response)
             document.getElementById('canvas').classList.remove('hide');
@@ -59,6 +133,31 @@ document.getElementById('submitBtn').addEventListener('click', function () {
     xhr.send(formData);
 });
 
+function onSettingsClick () {
+    var settings = document.getElementById('settings');
+    var icon = document.getElementById('icon');
+    icon.classList.toggle('rotate-90');
+    settings.classList.toggle('hide');
+}
+
+function isValidColor (color) {
+    // Check for valid hex color code
+    const hexColorRegex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+    if (hexColorRegex.test(color)) {
+        return true;
+    }
+
+    // Check for valid HTML color name using a dummy element
+    const testElement = document.createElement('div');
+    testElement.style.color = color;
+    return testElement.style.color !== '';
+}
+
+function colorListener (color, cls) {
+    console.log(colors)
+    colors[ cls ] = isValidColor(color) ? color : 'red';
+}
+
 function drawBoxes (boxes) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -67,7 +166,7 @@ function drawBoxes (boxes) {
     let scaleFactor = 1; // Initial zoom scale
     let offsetX = 0; // Initial pan offsets
     let offsetY = 0;
-    let isPanning = false;
+    let isPanning = false
     let startX = 0;
     let startY = 0;
 
@@ -106,7 +205,7 @@ function drawBoxes (boxes) {
 
             // Draw bounding boxes and labels
             boxes.forEach(box => {
-                if (box.confidence >= 0.7) {
+                if (box.confidence >= confidence && toShow[ box.class ]) {
                     const x1 = box.x1 * initialScale;
                     const y1 = box.y1 * initialScale;
                     const x2 = box.x2 * initialScale;
@@ -115,23 +214,25 @@ function drawBoxes (boxes) {
                     // Draw the bounding box
                     ctx.beginPath();
                     ctx.rect(x1, y1, x2 - x1, y2 - y1);
-                    ctx.lineWidth = 4;
-                    ctx.strokeStyle = 'red';
+                    ctx.lineWidth = lineWidth;
+                    ctx.strokeStyle = colors[ box.class ];
                     ctx.stroke();
                     ctx.closePath();
 
                     // Draw the label with class and confidence
-                    const label = `${ classes[ box.class ] } (${ (box.confidence * 100).toFixed(1) }%)`;
-                    const textWidth = ctx.measureText(label).width;
-                    const textHeight = fontSize + 4;
+                    if (drawLabel) { 
+                        const label = `${ classes[ box.class ] } (${ (box.confidence * 100).toFixed(1) }%)`;
+                        const textWidth = ctx.measureText(label).width;
+                        const textHeight = fontSize + 4;
 
-                    // Draw label background
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                    ctx.fillRect(x1, y1 - textHeight, textWidth + 4, textHeight);
+                        // Draw label background
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                        ctx.fillRect(x1, y1 - textHeight, textWidth + 4, textHeight);
 
-                    // Draw label text
-                    ctx.fillStyle = 'white';
-                    ctx.fillText(label, x1 + 2, y1 - 4);
+                        // Draw label text
+                        ctx.fillStyle = 'white';
+                        ctx.fillText(label, x1 + 2, y1 - 4);
+                    }
                 }
             });
 
@@ -185,7 +286,7 @@ function showDetections (boxes) {
     rsb.innerHTML = ""
 
     boxes.forEach(box => {
-        if (box.confidence >= 0.7) {
+        if (box.confidence >= confidence && toShow[box.class]) {
             const container = document.createElement('div');
             container.classList.add('margined', 'text-gray');
             const card = document.createElement('div');
@@ -269,7 +370,7 @@ function countDetections (boxes) {
     var count = [0,0,0];
     
     boxes.forEach(box => {
-        if (box.confidence >= 0.7) {
+        if (box.confidence >= confidence && toShow[box.class]) {
             count[ box.class ]++;
         }
     });

@@ -32,6 +32,81 @@
                 <div class="row margin-lg centered hide" id="loading">
                     Please wait...
                 </div>
+                <div class="row margin-lg full centered">
+                    <p class='headtext'>SETTINGS</p>
+                    <img id='icon' class="small-icon centered" src="../static/raw/chevron.svg" onclick="onSettingsClick();"/>
+                </div>
+                <div id="settings" class="hide">
+                    <div class="row margin-lg">
+                    <div class="col full">
+                        <div class="row full">
+                            <input id="showLabel" type="checkbox" checked>
+                            <label for="checkbox">Show Labels</label>
+                        </div>
+                    </div>
+                    <div class="col full">
+                        <div class="row full">
+                            <div class="col full">
+                                <p>Confidence</p>
+                            </div>
+                            <div class="col full">
+                                <span id="confValue">70%</span>
+                            </div>
+                            <div class="col full">
+                                <input id="confScroll" type="range" min="0" max="1" step="0.001" value="0.7">
+                            </div>
+                        </div>
+                        <div class="row full">
+                            <div class="col full">
+                                <p>Width</p>
+                            </div>
+                            <div class="col full">
+                                <span id="lineWidthValue">4px</span>
+                            </div>
+                            <div class="col full">
+                                <input id="lineWidth" type="range" min="0.1" max="10" step="0.1" value="4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row margin-lg">
+                    <div class="col full">
+                        <div class="row full">
+                            <div class="col full">
+                                <label for="checkbox">Broccoli</label>
+                            </div>
+                            <div class="col full">
+                                <input id="class0" type="checkbox" checked>
+                            </div>
+                            <div class="col full">
+                                <input type='text' id="class0color" placeholder="red or hex code" value="red">
+                            </div>
+                        </div>
+                        <div class="row full">
+                            <div class="col full">
+                                <label for="checkbox">Cabbage</label>
+                            </div>
+                            <div class="col full">
+                                <input id="class1" type="checkbox" checked>
+                            </div>
+                            <div class="col full">
+                                <input type='text' id="class1color" placeholder="red or hex code" value="red">
+                            </div>
+                        </div>
+                        <div class="row full">
+                            <div class="col full">
+                                <label for="checkbox">Cauliflower</label>
+                            </div>
+                            <div class="col full">
+                                <input id="class2" type="checkbox" checked>
+                            </div>
+                            <div class="col full">
+                                <input type='text' id="class2color" placeholder="red or hex code" value="red">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
                 <div class="centered row">
                     <input type="file" id="imageUpload" value="Select an image" accept="image/*">
                     <button id="submitBtn" class="custom-file-upload">Upload image</button>
