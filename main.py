@@ -107,14 +107,14 @@ def draw_box(frame, detection):
     # Render a smaller text size
     cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
 
-camera = None #cv2.VideoCapture(0)  # Capture from webcam
+camera = cv2.VideoCapture(0)  # Capture from webcam
 latest_detections = []  # To store the latest detections
 videoStartTime = 0
 videoFrames = 0
 
 latest_detections = []  # This will store the latest detection boxes
 frame_count = 0  # Keep track of frames
-skip_inference = 5  # Number of frames to skip between inferences
+skip_inference = 12 # Number of frames to skip between inferences
 
 def generate_frames():
     global latest_detections
