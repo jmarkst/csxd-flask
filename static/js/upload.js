@@ -112,7 +112,7 @@ function drawInformationUsingCached (body, boxes, veget) {
     const checkSingleLabel = document.createElement('p');
     checkSingleLabel.innerHTML = "Show single values"
     checkSingle.checked = stateCheck ? true : false;
-    checkSingle.name = 'leftValues';
+    checkSingle.name = 'leftValues' + veget
     checkSingle.addEventListener('click', () => {
         if (checkSingle.checked) {
             showSingleOnly = true;
@@ -132,7 +132,7 @@ function drawInformationUsingCached (body, boxes, veget) {
     checkMultiple.type = 'radio';
     const checkMultipleLabel = document.createElement('p');
     checkMultipleLabel.innerHTML = "Show calculated values"
-    checkMultiple.name = 'leftValues'
+    checkMultiple.name = 'leftValues' + veget
     checkMultiple.checked = stateCheck == false ? true : false;
     checkMultiple.addEventListener('click', () => {
         if (checkMultiple.checked) {
